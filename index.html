@@ -390,9 +390,15 @@ tr:hover .row-actions { opacity: 1; }
               <input type="text" id="qaTournament" placeholder="e.g. Valorant Invitational" style="background:var(--panel2);border:1px solid var(--border2);color:var(--text);padding:7px 10px;border-radius:5px;font-size:13px;font-family:var(--font-b);outline:none;width:100%">
             </div>
             <div class="form-group" style="flex:1;min-width:120px">
-              <label>Organizer *</label>
-              <input type="text" id="qaOrganizer" placeholder="e.g. Nodwin" style="background:var(--panel2);border:1px solid var(--border2);color:var(--text);padding:7px 10px;border-radius:5px;font-size:13px;font-family:var(--font-b);outline:none;width:100%">
-            </div>
+  <label>Organizer *</label>
+  <select id="qaOrganizer" style="background:var(--panel2);border:1px solid var(--border2);color:var(--text);padding:7px 10px;border-radius:5px;font-size:13px;font-family:var(--font-b);outline:none;width:100%">
+    <option value="">— Select —</option>
+    <option>ENDGEN eSports</option>
+    <option>Killer Scrims</option>
+    <option>TN eSports</option>
+    <option value="Other">Other</option>
+  </select>
+</div>
             <div class="form-group" style="flex:0 0 110px">
               <label>Amount (₹) *</label>
               <input type="number" id="qaAmount" min="0" placeholder="0" style="background:var(--panel2);border:1px solid var(--border2);color:var(--text);padding:7px 10px;border-radius:5px;font-size:13px;font-family:var(--font-b);outline:none;width:100%">
