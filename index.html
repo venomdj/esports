@@ -599,11 +599,14 @@ tr:hover .row-actions { opacity: 1; }
         </div>
 
         <div class="panel">
-          <div class="panel-title">All Payment Reminders</div>
-          <ul class="reminder-list" id="allReminders">
-            <li style="color:var(--faint);font-size:12px">No pending payments.</li>
-          </ul>
-        </div>
+  <div class="panel-title">
+    All Payment Reminders
+    <span style="font-size:11px;color:var(--faint);font-weight:400;text-transform:none;letter-spacing:0">Click "Mark Paid" to clear a reminder</span>
+  </div>
+  <ul class="reminder-list" id="allReminders">
+    <li style="color:var(--faint);font-size:12px">No pending payments.</li>
+  </ul>
+</div>
       </section>
     </div>
   </div>
@@ -1117,8 +1120,75 @@ function renderDashboard() {
       </tr>`).join('');
   }
 
-  // Reminders
-  renderReminders('dashReminders', 5);
+ function renderReminders(containerId, limit = Infinity) {
+  const now = today();
+  const reminderDays = goals.reminderDays || 7;
+  const pending = earnings.filter(e => e.status === 'Pending');
+  const items = pending.map(e => {
+    const due = e.expectedPaymentDate || e.date;
+    const diff = due ? Math.floor((new Date(due + 'T00:00:00') - new Date(now + 'T00:00:00')) / 86400000) : null;
+    let cls = 'ok', label = 'Upcoming';
+    if (diff !== null) {
+      if (diff < 0) { cls = 'overdue'; label = `Overdue by ${Math.abs(diff)}d`; }
+      else if (diff === 0) { cls = 'overdue'; label = 'Due today'; }
+      else if (diff <= reminderDays) { cls = 'soon'; label = `Due in ${diff}d`; }
+    }
+    return { e, due, diff, cls, label };
+  }).sort((a, b) => {
+    const order = { overdue: 0, soon: 1, ok: 2 };
+    return order[a.cls] - order[b.cls] || (a.diff ?? 999) - (b.diff ?? 999);
+  }).slice(0, limit);
+
+  const ul = document.getElementById(containerId);
+  if (!ul) return;
+  if (items.length === 0) { ul.innerHTML = '<li style="color:var(--faint);font-size:12px">No pending payments.</li>'; return; }
+
+  const showActions = containerId === 'allReminders';
+  ul.innerHTML = items.map(({ e, due, cls, label }) => `
+    <li class="reminder-item" style="justify-content:space-between;align-items:center">
+      <div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0">
+        <div class="rem-dot ${cls}" style="margin-top:6px"></div>
+        <div style="min-width:0">
+          <div class="rem-name">${esc(e.tournament)}</div>
+          <div class="rem-sub">${esc(e.organizer)} · ${money(e.amount)}</div>
+          <div class="rem-label ${cls}">${label}${due ? ' · ' + fmtDate(due) : ''}</div>
+        </div>
+      </div>
+      ${showActions ? `
+      <div style="display:flex;gap:6px;flex-shrink:0;margin-left:12px">
+        <button class="btn btn-ghost btn-sm" style="color:var(--green);border-color:var(--green);font-size:11px" onclick="markReminderPaid('${e.id}')">✓ Mark Paid</button>
+        <button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="snoozeReminder('${e.id}', '${e.expectedPaymentDate || ''}')">Snooze 7d</button>
+      </div>` : ''}
+    </li>`).join('');
+}
+
+async function markReminderPaid(id) {
+  if (!firebaseReady) return toast('Configure Firebase first.', 'error');
+  const ok = await confirm(`Mark this earning as Paid?`);
+  if (!ok) return;
+  try {
+    await window._fb.updateDoc(window._docRef(earningsCol, id), {
+      status: 'Paid',
+      updatedAt: window._fb.serverTimestamp()
+    });
+    toast('Marked as Paid ✓');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function snoozeReminder(id, currentExpected) {
+  if (!firebaseReady) return toast('Configure Firebase first.', 'error');
+  const base = currentExpected || today();
+  const newDate = new Date(base + 'T00:00:00');
+  newDate.setDate(newDate.getDate() + 7);
+  const newIso = newDate.toISOString().split('T')[0];
+  try {
+    await window._fb.updateDoc(window._docRef(earningsCol, id), {
+      expectedPaymentDate: newIso,
+      updatedAt: window._fb.serverTimestamp()
+    });
+    toast('Snoozed by 7 days.');
+  } catch(e) { toast(e.message, 'error'); }
+}
 
   // Chart
   renderChart();
