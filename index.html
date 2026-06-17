@@ -96,6 +96,27 @@ nav { padding: 12px 8px; flex: 1; }
 .stat-value { font-family: var(--font-m); font-size: 24px; font-weight: 600; color: var(--text); line-height: 1.1; }
 .stat-sub { font-size: 11px; color: var(--faint); margin-top: 4px; }
 
+/* Hero earnings card */
+.hero-earnings { position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(63,208,255,0.10), rgba(43,213,118,0.06) 60%, transparent); border: 1px solid var(--border); border-radius: 10px; padding: 26px 28px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.hero-earnings::before { content: ''; position: absolute; top: -60px; right: -60px; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(63,208,255,0.25), transparent 70%); pointer-events: none; }
+.hero-earnings::after { content: ''; position: absolute; bottom: -80px; left: 20%; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(43,213,118,0.18), transparent 70%); pointer-events: none; }
+.hero-label { font-family: var(--font-d); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.hero-value { font-family: var(--font-m); font-size: 44px; font-weight: 700; line-height: 1; background: linear-gradient(120deg, var(--text), var(--cyan) 70%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -.5px; }
+.hero-sub { font-size: 12px; color: var(--muted); margin-top: 8px; }
+.hero-trend { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 4px 9px; border-radius: 20px; margin-left: 8px; }
+.hero-trend.up { background: var(--green-dim); color: var(--green); }
+.hero-trend.down { background: var(--red-dim); color: var(--red); }
+.hero-trend.flat { background: var(--panel2); color: var(--muted); }
+.hero-side { position: relative; z-index: 1; text-align: right; display: flex; flex-direction: column; gap: 10px; min-width: 160px; }
+.hero-mini { font-size: 11px; color: var(--muted); }
+.hero-mini b { color: var(--text); font-family: var(--font-m); font-weight: 600; }
+.hero-content { position: relative; z-index: 1; }
+
+/* Document rows */
+.doc-cat-badge { display: inline-flex; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; background: var(--cyan-dim); color: var(--cyan); }
+.doc-name-cell { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.doc-name-cell svg { width: 15px; height: 15px; color: var(--faint); flex-shrink: 0; }
+
 /* Dashboard grid */
 .dash-row { display: grid; gap: 16px; margin-bottom: 16px; }
 .dash-row.two { grid-template-columns: 1fr 1fr; }
@@ -143,7 +164,7 @@ nav { padding: 12px 8px; flex: 1; }
 .rem-name { font-size: 13px; font-weight: 500; }
 .rem-sub { font-size: 11px; color: var(--muted); }
 
-/* Earnings/Expenses toolbar */
+/* Earnings toolbar */
 .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
 .toolbar input, .toolbar select { background: var(--panel); border: 1px solid var(--border2); color: var(--text); padding: 7px 10px; border-radius: 5px; font-size: 13px; font-family: var(--font-b); outline: none; }
 .toolbar input:focus, .toolbar select:focus { border-color: var(--cyan); }
@@ -227,6 +248,9 @@ tr:hover .row-actions { opacity: 1; }
   .goals-form { grid-template-columns: 1fr; }
   .modal-form .row2 { grid-template-columns: 1fr; }
   .toolbar input[type="search"] { width: 140px; }
+  .hero-earnings { flex-direction: column; align-items: flex-start; padding: 20px; }
+  .hero-side { text-align: left; width: 100%; flex-direction: row; justify-content: space-between; }
+  .hero-value { font-size: 34px; }
 }
 </style>
 </head>
@@ -246,10 +270,6 @@ tr:hover .row-actions { opacity: 1; }
       <button class="nav-link" data-page="earnings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         Earnings
-      </button>
-      <button class="nav-link" data-page="expenses">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 3H8L6 7h12z"/></svg>
-        Expenses
       </button>
       <button class="nav-link" data-page="goals">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
@@ -271,10 +291,6 @@ tr:hover .row-actions { opacity: 1; }
     <div class="topbar">
       <span class="page-title" id="pageTitle">Dashboard</span>
       <div class="actions">
-        <button class="btn btn-ghost btn-sm" id="btnAddExpenseTop">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Expense
-        </button>
         <button class="btn btn-primary btn-sm" id="btnAddEarningTop">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Add Earning
@@ -290,36 +306,39 @@ tr:hover .row-actions { opacity: 1; }
 
       <!-- DASHBOARD -->
       <section class="page active" id="page-dashboard">
-        <div class="stat-grid">
-          <div class="stat-card cyan">
-            <div class="stat-label">Total Earned</div>
-            <div class="stat-value" id="statTotalEarned">—</div>
-            <div class="stat-sub" id="statTotalCount"></div>
+        <div class="hero-earnings">
+          <div class="hero-content">
+            <div class="hero-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5c0-1.4 1.3-2.5 3-2.5s3 1.1 3 2.5-1.3 2-3 2.5-3 1.1-3 2.5 1.3 2.5 3 2.5 3-1.1 3-2.5"/></svg>
+              Total Earned · Lifetime
+            </div>
+            <div class="hero-value" id="statTotalEarned">—</div>
+            <div class="hero-sub">
+              <span id="statTotalCount"></span>
+              <span class="hero-trend flat" id="heroTrend" style="display:none"></span>
+            </div>
           </div>
+          <div class="hero-side">
+            <div class="hero-mini">This Year <b id="statThisYear">—</b></div>
+            <div class="hero-mini">Avg / Event <b id="statAvgPerEvent">—</b></div>
+          </div>
+        </div>
+
+        <div class="stat-grid">
           <div class="stat-card green">
             <div class="stat-label">This Month</div>
             <div class="stat-value" id="statThisMonth">—</div>
             <div class="stat-sub" id="statMonthSub"></div>
-          </div>
-          <div class="stat-card green">
-            <div class="stat-label">This Year</div>
-            <div class="stat-value" id="statThisYear">—</div>
-            <div class="stat-sub" id="statYearSub"></div>
           </div>
           <div class="stat-card amber">
             <div class="stat-label">Pending</div>
             <div class="stat-value" id="statPending">—</div>
             <div class="stat-sub" id="statPendingCount"></div>
           </div>
-          <div class="stat-card red">
-            <div class="stat-label">Expenses</div>
-            <div class="stat-value" id="statExpenses">—</div>
-            <div class="stat-sub" id="statExpSub"></div>
-          </div>
           <div class="stat-card purple">
-            <div class="stat-label">Net Profit</div>
-            <div class="stat-value" id="statProfit">—</div>
-            <div class="stat-sub">Paid earnings − expenses</div>
+            <div class="stat-label">Best Month</div>
+            <div class="stat-value" id="statBestMonth">—</div>
+            <div class="stat-sub" id="statBestMonthSub"></div>
           </div>
         </div>
 
@@ -341,7 +360,7 @@ tr:hover .row-actions { opacity: 1; }
 
         <div class="dash-row three">
           <div class="panel">
-            <div class="panel-title">Monthly Earnings vs Expenses</div>
+            <div class="panel-title">Monthly Earnings Trend</div>
             <canvas id="monthlyChart"></canvas>
           </div>
           <div class="panel">
@@ -474,45 +493,11 @@ tr:hover .row-actions { opacity: 1; }
         </div>
       </section>
 
-      <!-- EXPENSES -->
-      <section class="page" id="page-expenses">
-        <div class="toolbar">
-          <input type="search" id="expenseSearch" placeholder="Search description…">
-          <select id="expenseCatFilter">
-            <option value="">All Categories</option>
-            <option>Travel</option><option>Equipment</option><option>Software</option>
-            <option>Internet</option><option>Marketing</option><option>Taxes</option><option>Other</option>
-          </select>
-          <div class="spacer"></div>
-          <button class="btn btn-ghost btn-sm" id="btnExportExpensesCSV">CSV</button>
-          <button class="btn btn-ghost btn-sm" id="btnExportExpensesXLSX">Excel</button>
-          <button class="btn btn-primary btn-sm" id="btnAddExpense">+ Add Expense</button>
-        </div>
-        <div class="row-count" id="expensesRowCount"></div>
-        <div class="table-wrap">
-          <table class="main-table">
-            <thead>
-              <tr>
-                <th data-sort-exp="date">Date</th>
-                <th data-sort-exp="description">Description</th>
-                <th data-sort-exp="category">Category</th>
-                <th data-sort-exp="amount">Amount</th>
-                <th>Notes</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="expensesTableBody"></tbody>
-            <tfoot><tr class="tfoot-row"><td colspan="3" id="expensesFooterLabel"></td><td colspan="3" id="expensesFooterAmt" class="mono"></td></tr></tfoot>
-          </table>
-        </div>
-        <div class="empty-state" id="expensesEmpty" style="display:none">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 3H8L6 7h12z"/></svg>
-          <p>No expense records yet.</p>
-        </div>
-      </section>
-
       <!-- DOCUMENTS -->
       <section class="page" id="page-documents">
+        <div class="setup-banner" id="storageBanner" style="margin-bottom:16px">
+          <b>⚙️ Firebase Storage not enabled.</b> In your Firebase Console, go to Build → Storage → Get started, then set rules (see setup instructions at the bottom of this file) so uploads work.
+        </div>
         <div class="panel" style="margin-bottom:16px">
           <div class="panel-title">Upload Document</div>
           <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:8px">
@@ -623,10 +608,6 @@ tr:hover .row-actions { opacity: 1; }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       Earnings
     </button>
-    <button class="bnav-link" data-page="expenses">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 3H8L6 7h12z"/></svg>
-      Expenses
-    </button>
     <button class="bnav-link" data-page="goals">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
       Goals
@@ -699,45 +680,6 @@ tr:hover .row-actions { opacity: 1; }
   </div>
 </div>
 
-<!-- Expense Modal -->
-<div class="modal-overlay" id="expenseModal">
-  <div class="modal">
-    <div class="modal-title" id="expenseModalTitle">Add Expense</div>
-    <div class="modal-form">
-      <input type="hidden" id="expenseId">
-      <div class="row2">
-        <div class="form-group">
-          <label>Date *</label>
-          <input type="date" id="expenseDate" required>
-        </div>
-        <div class="form-group">
-          <label>Amount *</label>
-          <input type="number" id="expenseAmount" min="0" step="0.01" placeholder="0.00" required>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Description *</label>
-        <input type="text" id="expenseDescription" placeholder="e.g. Flight to event" required>
-      </div>
-      <div class="form-group">
-        <label>Category</label>
-        <select id="expenseCategory">
-          <option>Travel</option><option>Equipment</option><option>Software</option>
-          <option>Internet</option><option>Marketing</option><option>Taxes</option><option>Other</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Notes</label>
-        <textarea id="expenseNotes" placeholder="Any additional notes…"></textarea>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" id="btnCancelExpense">Cancel</button>
-      <button class="btn btn-primary" id="btnSaveExpense">Save Expense</button>
-    </div>
-  </div>
-</div>
-
 <!-- Confirm Modal -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal" style="max-width:380px">
@@ -773,12 +715,14 @@ const CURRENCY = '₹';
 // ============================================================
 
 // ---- State ----
-let earnings = [], expenses = [], goals = { monthly: 0, yearly: 0, reminderDays: 7 };
+let earnings = [], goals = { monthly: 0, yearly: 0, reminderDays: 7 };
+let documents = [];
 let firebaseReady = false;
-let db, earningsCol, expensesCol, settingsDocRef;
+let storageReady = false;
+let db, storage, earningsCol, documentsCol, settingsDocRef;
 let chart = null;
 let earningSort = { key: 'date', dir: 'desc' };
-let expenseSort = { key: 'date', dir: 'desc' };
+let docSort = { key: 'uploadedAt', dir: 'desc' };
 let confirmResolve = null;
 
 // ---- Firebase init ----
@@ -786,6 +730,7 @@ const isPlaceholder = FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY' || !FIREBASE_CON
 
 if (isPlaceholder) {
   document.getElementById('setupBanner').style.display = 'block';
+  document.getElementById('storageBanner').style.display = 'block';
   setConn('warn', 'Setup needed');
   renderAll();
 } else {
@@ -798,7 +743,7 @@ if (isPlaceholder) {
       const app = initializeApp(FIREBASE_CONFIG);
       db = getFirestore(app);
       earningsCol = collection(db, 'earnings');
-      expensesCol = collection(db, 'expenses');
+      documentsCol = collection(db, 'documents');
       settingsDocRef = doc(db, 'settings', 'goals');
       firebaseReady = true;
 
@@ -828,18 +773,35 @@ if (isPlaceholder) {
         toast('Firestore error: ' + err.message, 'error');
       });
 
-      const qExpenses = query(expensesCol, orderBy('date', 'desc'));
-      onSnapshot(qExpenses, snap => {
-        expenses = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderAll();
-      }, () => {});
+      const qDocuments = query(documentsCol, orderBy('uploadedAt', 'desc'));
+      onSnapshot(qDocuments, snap => {
+        documents = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderDocsList();
+      }, err => {
+        toast('Could not load documents: ' + err.message, 'error');
+      });
 
       // store firebase functions for CRUD
       window._fb = { addDoc, updateDoc, deleteDoc, setDoc, serverTimestamp };
 
+      // Firebase Storage (for document uploads) — optional, separate try so a missing
+      // Storage setup doesn't break the rest of the app.
+      try {
+        const { getStorage, ref: storageRef, uploadBytesResumable, getDownloadURL, deleteObject }
+          = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js');
+        storage = getStorage(app);
+        window._storage = { storageRef, uploadBytesResumable, getDownloadURL, deleteObject };
+        storageReady = true;
+        document.getElementById('storageBanner').style.display = 'none';
+      } catch(e) {
+        storageReady = false;
+        document.getElementById('storageBanner').style.display = 'block';
+      }
+
     } catch(e) {
       setConn('err', 'Init error');
       toast('Firebase init failed: ' + e.message, 'error');
+      document.getElementById('storageBanner').style.display = 'block';
       renderAll();
     }
   })();
@@ -874,7 +836,7 @@ function toast(msg, type = 'success') {
 function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 
 // ---- Navigation ----
-const pageTitles = { dashboard: 'Dashboard', earnings: 'Earnings', expenses: 'Expenses', goals: 'Goals & Reminders' };
+const pageTitles = { dashboard: 'Dashboard', earnings: 'Earnings', goals: 'Goals & Reminders', documents: 'Documents' };
 function goTo(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-link, .bnav-link').forEach(l => l.classList.remove('active'));
@@ -882,8 +844,8 @@ function goTo(page) {
   document.querySelectorAll(`[data-page="${page}"]`).forEach(l => l.classList.add('active'));
   document.getElementById('pageTitle').textContent = pageTitles[page] || page;
   if (page === 'earnings') { renderEarningsTable(); if (!document.getElementById('qaDate').value) document.getElementById('qaDate').value = today(); }
-  if (page === 'expenses') renderExpensesTable();
   if (page === 'goals') renderGoalsFull();
+  if (page === 'documents') renderDocsList();
 }
 document.querySelectorAll('[data-page]').forEach(el => el.addEventListener('click', () => goTo(el.dataset.page)));
 document.querySelectorAll('[data-page-link]').forEach(el => el.addEventListener('click', () => goTo(el.dataset.pageLink)));
@@ -1001,52 +963,11 @@ function import_doc(col, id) {
   return window._docRef(col, id);
 }
 
-// ---- Expense Modal ----
-function openExpenseModal(record = null) {
-  document.getElementById('expenseModalTitle').textContent = record ? 'Edit Expense' : 'Add Expense';
-  document.getElementById('expenseId').value = record?.id || '';
-  document.getElementById('expenseDate').value = record?.date || today();
-  document.getElementById('expenseDescription').value = record?.description || '';
-  document.getElementById('expenseCategory').value = record?.category || 'Other';
-  document.getElementById('expenseAmount').value = record?.amount || '';
-  document.getElementById('expenseNotes').value = record?.notes || '';
-  openModal('expenseModal');
-}
-document.getElementById('btnAddExpense').addEventListener('click', () => openExpenseModal());
-document.getElementById('btnAddExpenseTop').addEventListener('click', () => openExpenseModal());
-document.getElementById('btnCancelExpense').addEventListener('click', () => closeModal('expenseModal'));
-document.getElementById('btnSaveExpense').addEventListener('click', saveExpense);
-
-async function saveExpense() {
-  if (!firebaseReady) return toast('Configure Firebase first.', 'error');
-  const date = document.getElementById('expenseDate').value;
-  const description = document.getElementById('expenseDescription').value.trim();
-  const amount = parseFloat(document.getElementById('expenseAmount').value);
-  if (!date || !description || isNaN(amount) || amount < 0) return toast('Fill required fields.', 'error');
-  const data = {
-    date, description, amount,
-    category: document.getElementById('expenseCategory').value,
-    notes: document.getElementById('expenseNotes').value.trim(),
-  };
-  const id = document.getElementById('expenseId').value;
-  try {
-    if (id) {
-      await window._fb.updateDoc(window._docRef(expensesCol, id), { ...data, updatedAt: window._fb.serverTimestamp() });
-      toast('Expense updated.');
-    } else {
-      await window._fb.addDoc(expensesCol, { ...data, createdAt: window._fb.serverTimestamp() });
-      toast('Expense added.');
-    }
-    closeModal('expenseModal');
-  } catch(e) { toast(e.message, 'error'); }
-}
-
 // ---- Render All ----
 function renderAll() {
   renderDashboard();
-  // earnings/expenses tables render only if their page is active (to avoid performance waste)
+  // tables render only if their page is active (to avoid performance waste)
   if (document.getElementById('page-earnings').classList.contains('active')) renderEarningsTable();
-  if (document.getElementById('page-expenses').classList.contains('active')) renderExpensesTable();
   if (document.getElementById('page-goals').classList.contains('active')) renderGoalsFull();
 }
 
@@ -1064,22 +985,54 @@ function renderDashboard() {
   const totalPending = pending.reduce((s, e) => s + (Number(e.amount) || 0), 0);
   const monthTotal = monthPaid.reduce((s, e) => s + (Number(e.amount) || 0), 0);
   const yearTotal = yearPaid.reduce((s, e) => s + (Number(e.amount) || 0), 0);
-  const totalExp = expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
-  const netProfit = totalPaid - totalExp;
+  const avgPerEvent = paid.length ? totalPaid / paid.length : 0;
+
+  // Previous month total, for the trend chip
+  const prevMonthDate = new Date(); prevMonthDate.setMonth(prevMonthDate.getMonth() - 1);
+  const prevMonthKey = prevMonthDate.toISOString().slice(0, 7);
+  const prevMonthTotal = paid.filter(e => (e.date || '').startsWith(prevMonthKey)).reduce((s, e) => s + (Number(e.amount) || 0), 0);
+
+  // Best month, lifetime
+  const monthTotals = {};
+  paid.forEach(e => {
+    const k = (e.date || '').slice(0, 7);
+    if (!k) return;
+    monthTotals[k] = (monthTotals[k] || 0) + (Number(e.amount) || 0);
+  });
+  let bestMonthKey = null, bestMonthTotal = 0;
+  Object.entries(monthTotals).forEach(([k, v]) => { if (v > bestMonthTotal) { bestMonthTotal = v; bestMonthKey = k; } });
 
   setText('statTotalEarned', money(totalPaid));
   setText('statTotalCount', `${paid.length} paid booking${paid.length !== 1 ? 's' : ''}`);
+  setText('statThisYear', money(yearTotal));
+  setText('statAvgPerEvent', money(avgPerEvent));
   setText('statThisMonth', money(monthTotal));
   setText('statMonthSub', `${monthPaid.length} booking${monthPaid.length !== 1 ? 's' : ''} this month`);
-  setText('statThisYear', money(yearTotal));
-  setText('statYearSub', `${yearPaid.length} booking${yearPaid.length !== 1 ? 's' : ''} this year`);
   setText('statPending', money(totalPending));
   setText('statPendingCount', `${pending.length} outstanding`);
-  setText('statExpenses', money(totalExp));
-  setText('statExpSub', `${expenses.length} logged`);
-  const profitEl = document.getElementById('statProfit');
-  profitEl.textContent = money(netProfit);
-  profitEl.style.color = netProfit >= 0 ? 'var(--green)' : 'var(--red)';
+  if (bestMonthKey) {
+    const [by, bm] = bestMonthKey.split('-');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    setText('statBestMonth', money(bestMonthTotal));
+    setText('statBestMonthSub', `${months[parseInt(bm)-1]} ${by}`);
+  } else {
+    setText('statBestMonth', '—');
+    setText('statBestMonthSub', 'No paid earnings yet');
+  }
+
+  // Trend chip: this month vs last month
+  const trendEl = document.getElementById('heroTrend');
+  if (trendEl) {
+    if (prevMonthTotal > 0) {
+      const pct = ((monthTotal - prevMonthTotal) / prevMonthTotal) * 100;
+      trendEl.style.display = 'inline-flex';
+      if (Math.abs(pct) < 1) { trendEl.className = 'hero-trend flat'; trendEl.textContent = '— flat vs last month'; }
+      else if (pct > 0) { trendEl.className = 'hero-trend up'; trendEl.textContent = `▲ ${pct.toFixed(0)}% vs last month`; }
+      else { trendEl.className = 'hero-trend down'; trendEl.textContent = `▼ ${Math.abs(pct).toFixed(0)}% vs last month`; }
+    } else {
+      trendEl.style.display = 'none';
+    }
+  }
 
   // Goals progress
   setGoalBar('goalMonthBar', 'goalMonthLabel', monthTotal, goals.monthly);
@@ -1120,7 +1073,24 @@ function renderDashboard() {
       </tr>`).join('');
   }
 
- function renderReminders(containerId, limit = Infinity) {
+  // Reminders (dashboard preview, with Mark Paid actions, capped to 5)
+  renderReminders('dashReminders', 5);
+
+  // Chart
+  renderChart();
+}
+
+function setGoalBar(barId, labelId, current, goal) {
+  const pct = goal > 0 ? Math.min(100, (current / goal) * 100) : 0;
+  const bar = document.getElementById(barId);
+  const lbl = document.getElementById(labelId);
+  bar.style.width = pct.toFixed(1) + '%';
+  bar.className = 'progress-fill' + (pct >= 100 ? ' done' : '');
+  if (lbl) lbl.textContent = goal > 0 ? `${money(current)} / ${money(goal)} (${pct.toFixed(0)}%)` : 'No goal set';
+}
+
+// ---- Payment Reminders (used on both Dashboard and Goals pages — always shows Mark Paid) ----
+function renderReminders(containerId, limit = Infinity) {
   const now = today();
   const reminderDays = goals.reminderDays || 7;
   const pending = earnings.filter(e => e.status === 'Pending');
@@ -1143,7 +1113,6 @@ function renderDashboard() {
   if (!ul) return;
   if (items.length === 0) { ul.innerHTML = '<li style="color:var(--faint);font-size:12px">No pending payments.</li>'; return; }
 
-  const showActions = containerId === 'allReminders';
   ul.innerHTML = items.map(({ e, due, cls, label }) => `
     <li class="reminder-item" style="justify-content:space-between;align-items:center">
       <div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0">
@@ -1154,15 +1123,14 @@ function renderDashboard() {
           <div class="rem-label ${cls}">${label}${due ? ' · ' + fmtDate(due) : ''}</div>
         </div>
       </div>
-      ${showActions ? `
       <div style="display:flex;gap:6px;flex-shrink:0;margin-left:12px">
         <button class="btn btn-ghost btn-sm" style="color:var(--green);border-color:var(--green);font-size:11px" onclick="markReminderPaid('${e.id}')">✓ Mark Paid</button>
         <button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="snoozeReminder('${e.id}', '${e.expectedPaymentDate || ''}')">Snooze 7d</button>
-      </div>` : ''}
+      </div>
     </li>`).join('');
 }
 
-async function markReminderPaid(id) {
+window.markReminderPaid = async (id) => {
   if (!firebaseReady) return toast('Configure Firebase first.', 'error');
   const ok = await confirm(`Mark this earning as Paid?`);
   if (!ok) return;
@@ -1173,9 +1141,9 @@ async function markReminderPaid(id) {
     });
     toast('Marked as Paid ✓');
   } catch(e) { toast(e.message, 'error'); }
-}
+};
 
-async function snoozeReminder(id, currentExpected) {
+window.snoozeReminder = async (id, currentExpected) => {
   if (!firebaseReady) return toast('Configure Firebase first.', 'error');
   const base = currentExpected || today();
   const newDate = new Date(base + 'T00:00:00');
@@ -1188,51 +1156,7 @@ async function snoozeReminder(id, currentExpected) {
     });
     toast('Snoozed by 7 days.');
   } catch(e) { toast(e.message, 'error'); }
-}
-
-  // Chart
-  renderChart();
-}
-
-function setGoalBar(barId, labelId, current, goal) {
-  const pct = goal > 0 ? Math.min(100, (current / goal) * 100) : 0;
-  const bar = document.getElementById(barId);
-  const lbl = document.getElementById(labelId);
-  bar.style.width = pct.toFixed(1) + '%';
-  bar.className = 'progress-fill' + (pct >= 100 ? ' done' : '');
-  if (lbl) lbl.textContent = goal > 0 ? `${money(current)} / ${money(goal)} (${pct.toFixed(0)}%)` : 'No goal set';
-}
-
-function renderReminders(containerId, limit = Infinity) {
-  const now = today();
-  const reminderDays = goals.reminderDays || 7;
-  const pending = earnings.filter(e => e.status === 'Pending');
-  const items = pending.map(e => {
-    const due = e.expectedPaymentDate || e.date;
-    const diff = due ? Math.floor((new Date(due + 'T00:00:00') - new Date(now + 'T00:00:00')) / 86400000) : null;
-    let cls = 'ok', label = 'Upcoming';
-    if (diff !== null) {
-      if (diff < 0) { cls = 'overdue'; label = `Overdue by ${Math.abs(diff)}d`; }
-      else if (diff <= reminderDays) { cls = 'soon'; label = `Due in ${diff}d`; }
-    }
-    return { e, due, diff, cls, label };
-  }).sort((a, b) => {
-    const order = { overdue: 0, soon: 1, ok: 2 };
-    return order[a.cls] - order[b.cls] || (a.diff ?? 999) - (b.diff ?? 999);
-  }).slice(0, limit);
-
-  const ul = document.getElementById(containerId);
-  if (items.length === 0) { ul.innerHTML = '<li style="color:var(--faint);font-size:12px">No pending payments.</li>'; return; }
-  ul.innerHTML = items.map(({ e, due, cls, label }) => `
-    <li class="reminder-item">
-      <div class="rem-dot ${cls}"></div>
-      <div>
-        <div class="rem-name">${esc(e.tournament)}</div>
-        <div class="rem-sub">${esc(e.organizer)} · ${money(e.amount)}</div>
-        <div class="rem-label ${cls}">${label}${due ? ' · ' + fmtDate(due) : ''}</div>
-      </div>
-    </li>`).join('');
-}
+};
 
 // ---- Chart ----
 function renderChart() {
@@ -1242,24 +1166,24 @@ function renderChart() {
   const earnData = months.map(({ key }) =>
     earnings.filter(e => e.status === 'Paid' && (e.date || '').startsWith(key))
              .reduce((s, e) => s + (Number(e.amount)||0), 0));
-  const expData = months.map(({ key }) =>
-    expenses.filter(e => (e.date||'').startsWith(key))
-             .reduce((s, e) => s + (Number(e.amount)||0), 0));
   const labels = months.map(m => m.label);
 
-  if (chart) { chart.data.labels = labels; chart.data.datasets[0].data = earnData; chart.data.datasets[1].data = expData; chart.update(); return; }
+  if (chart) { chart.data.labels = labels; chart.data.datasets[0].data = earnData; chart.update(); return; }
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+  gradient.addColorStop(0, 'rgba(63,208,255,0.85)');
+  gradient.addColorStop(1, 'rgba(43,213,118,0.55)');
   chart = new Chart(canvas, {
     type: 'bar',
     data: {
       labels,
       datasets: [
-        { label: 'Earnings (paid)', data: earnData, backgroundColor: 'rgba(43,213,118,0.6)', borderColor: '#2BD576', borderWidth: 1.5, borderRadius: 3 },
-        { label: 'Expenses', data: expData, backgroundColor: 'rgba(255,59,92,0.5)', borderColor: '#FF3B5C', borderWidth: 1.5, borderRadius: 3 },
+        { label: 'Earnings (paid)', data: earnData, backgroundColor: gradient, borderColor: '#3FD0FF', borderWidth: 1.5, borderRadius: 4, maxBarThickness: 34 },
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: true,
-      plugins: { legend: { labels: { color: '#8A93A6', font: { size: 11 } } } },
+      plugins: { legend: { display: false } },
       scales: {
         x: { ticks: { color: '#4A5468', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,.03)' } },
         y: { ticks: { color: '#4A5468', font: { size: 10 }, callback: v => CURRENCY + v.toLocaleString() }, grid: { color: 'rgba(255,255,255,.05)' } }
@@ -1386,66 +1310,133 @@ function populateOrgFilter() {
   if (orgs.includes(prev)) sel.value = prev;
 }
 
-// ---- Expenses Table ----
-function getFilteredExpenses() {
-  const search = document.getElementById('expenseSearch').value.toLowerCase();
-  const cat = document.getElementById('expenseCatFilter').value;
-  return expenses.filter(e => {
-    if (cat && e.category !== cat) return false;
-    if (search && !`${e.description} ${e.notes}`.toLowerCase().includes(search)) return false;
-    return true;
-  }).sort((a, b) => {
-    let av = a[expenseSort.key], bv = b[expenseSort.key];
-    if (expenseSort.key === 'amount') { av = Number(av); bv = Number(bv); }
-    if (av < bv) return expenseSort.dir === 'asc' ? -1 : 1;
-    if (av > bv) return expenseSort.dir === 'asc' ? 1 : -1;
-    return 0;
-  });
+// ---- Documents (Firebase Storage uploads + Firestore metadata) ----
+function humanSize(bytes) {
+  if (!bytes) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let i = 0, n = bytes;
+  while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+  return `${n.toFixed(n < 10 && i > 0 ? 1 : 0)} ${units[i]}`;
 }
 
-function renderExpensesTable() {
-  const data = getFilteredExpenses();
-  const tbody = document.getElementById('expensesTableBody');
-  const empty = document.getElementById('expensesEmpty');
-  document.getElementById('expensesRowCount').textContent = `${data.length} record${data.length !== 1 ? 's' : ''}`;
-  if (data.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; }
-  else {
-    empty.style.display = 'none';
-    tbody.innerHTML = data.map(e => `
-      <tr>
-        <td class="mono" style="white-space:nowrap">${fmtDate(e.date)}</td>
-        <td>${esc(e.description)}</td>
-        <td><span class="badge" style="background:var(--cyan-dim);color:var(--cyan)">${esc(e.category || 'Other')}</span></td>
-        <td class="mono" style="color:var(--red);font-weight:600">${money(e.amount)}</td>
-        <td style="color:var(--muted);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.notes||'—')}</td>
-        <td><div class="row-actions">
-          <button class="icon-btn" onclick="editExpense('${e.id}')" title="Edit">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button class="icon-btn del" onclick="delExpense('${e.id}','${esc(e.description)}')" title="Delete">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-          </button>
-        </div></td>
-      </tr>`).join('');
+const MAX_DOC_SIZE = 25 * 1024 * 1024; // 25MB
+
+document.getElementById('btnUploadDoc').addEventListener('click', async () => {
+  if (!firebaseReady) return toast('Configure Firebase first.', 'error');
+  if (!storageReady) return toast("Firebase Storage isn't set up yet — see the banner above.", 'error');
+  const fileInput = document.getElementById('docFileInput');
+  const file = fileInput.files[0];
+  if (!file) return toast('Choose a file first.', 'error');
+  if (file.size > MAX_DOC_SIZE) return toast('File is too large (max 25MB).', 'error');
+
+  const category = document.getElementById('docCategory').value;
+  const label = document.getElementById('docLabel').value.trim();
+  const path = `documents/${Date.now()}_${file.name}`;
+  const fileRef = window._storage.storageRef(storage, path);
+  const uploadTask = window._storage.uploadBytesResumable(fileRef, file);
+
+  const progressWrap = document.getElementById('docUploadProgress');
+  const progressBar = document.getElementById('docProgressBar');
+  const progressLabel = document.getElementById('docProgressLabel');
+  const uploadBtn = document.getElementById('btnUploadDoc');
+  progressWrap.style.display = 'block';
+  progressBar.style.width = '0%';
+  progressLabel.textContent = 'Starting upload…';
+  uploadBtn.disabled = true;
+
+  uploadTask.on('state_changed',
+    snapshot => {
+      const pct = snapshot.totalBytes ? (snapshot.bytesTransferred / snapshot.totalBytes) * 100 : 0;
+      progressBar.style.width = pct.toFixed(0) + '%';
+      progressLabel.textContent = `Uploading… ${pct.toFixed(0)}%`;
+    },
+    err => {
+      toast('Upload failed: ' + err.message, 'error');
+      progressWrap.style.display = 'none';
+      uploadBtn.disabled = false;
+    },
+    async () => {
+      try {
+        const url = await window._storage.getDownloadURL(uploadTask.snapshot.ref);
+        await window._fb.addDoc(documentsCol, {
+          name: file.name,
+          category,
+          label,
+          size: file.size,
+          url,
+          storagePath: path,
+          uploadedAt: window._fb.serverTimestamp(),
+        });
+        toast('Document uploaded ✓');
+        fileInput.value = '';
+        document.getElementById('docLabel').value = '';
+      } catch (e) {
+        toast(e.message, 'error');
+      } finally {
+        progressWrap.style.display = 'none';
+        progressBar.style.width = '0%';
+        uploadBtn.disabled = false;
+      }
+    }
+  );
+});
+
+function getFilteredDocuments() {
+  const search = (document.getElementById('docSearch').value || '').toLowerCase();
+  if (!search) return documents;
+  return documents.filter(d => `${d.name} ${d.label || ''} ${d.category || ''}`.toLowerCase().includes(search));
+}
+
+function renderDocsList() {
+  const data = getFilteredDocuments();
+  const empty = document.getElementById('docsEmpty');
+  const table = document.getElementById('docsTable');
+  const tbody = document.getElementById('docsTableBody');
+  if (data.length === 0) {
+    empty.style.display = 'block';
+    table.style.display = 'none';
+    return;
   }
-  const filtTotal = data.reduce((s, e) => s + (Number(e.amount)||0), 0);
-  setText('expensesFooterLabel', `${data.length} records`);
-  setText('expensesFooterAmt', `Total: ${money(filtTotal)}`);
+  empty.style.display = 'none';
+  table.style.display = '';
+  tbody.innerHTML = data.map(d => {
+    const uploaded = (d.uploadedAt && d.uploadedAt.toDate) ? fmtDate(d.uploadedAt.toDate().toISOString().split('T')[0]) : '—';
+    return `
+    <tr>
+      <td><div class="doc-name-cell">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        ${esc(d.name)}
+      </div></td>
+      <td><span class="doc-cat-badge">${esc(d.category || 'Other')}</span></td>
+      <td style="color:var(--muted)">${esc(d.label || '—')}</td>
+      <td class="mono" style="color:var(--muted)">${humanSize(d.size)}</td>
+      <td style="color:var(--muted)">${uploaded}</td>
+      <td><div class="row-actions">
+        <a class="icon-btn" href="${esc(d.url)}" target="_blank" rel="noopener" title="Download">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </a>
+        <button class="icon-btn del" onclick="delDocument('${d.id}','${esc(d.storagePath || '')}','${esc(d.name)}')" title="Delete">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div></td>
+    </tr>`;
+  }).join('');
 }
 
-window.editExpense = id => { const r = expenses.find(e => e.id === id); if (r) openExpenseModal(r); };
-window.delExpense = async (id, name) => {
+window.delDocument = async (id, storagePath, name) => {
   const ok = await confirm(`Delete "${name}"?`);
   if (!ok) return;
   try {
-    await window._fb.deleteDoc(window._docRef(expensesCol, id));
-    toast('Expense deleted.');
-  } catch(e) { toast(e.message, 'error'); }
+    if (storagePath && window._storage) {
+      try { await window._storage.deleteObject(window._storage.storageRef(storage, storagePath)); } catch (e) { /* file may already be gone */ }
+    }
+    await window._fb.deleteDoc(window._docRef(documentsCol, id));
+    toast('Document deleted.');
+  } catch (e) { toast(e.message, 'error'); }
 };
 
-const debouncedRenderExp = debounce(renderExpensesTable, 200);
-document.getElementById('expenseSearch').addEventListener('input', debouncedRenderExp);
-document.getElementById('expenseCatFilter').addEventListener('change', renderExpensesTable);
+const debouncedRenderDocs = debounce(renderDocsList, 200);
+document.getElementById('docSearch').addEventListener('input', debouncedRenderDocs);
 
 // ---- Goals Page ----
 function renderGoalsFull() {
@@ -1495,20 +1486,6 @@ document.getElementById('btnExportEarningsXLSX').addEventListener('click', () =>
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Earnings');
   XLSX.writeFile(wb, 'earnings.xlsx');
-});
-
-document.getElementById('btnExportExpensesCSV').addEventListener('click', () => {
-  const data = getFilteredExpenses();
-  const csv = arrToCSV(data.map(e => [e.date, e.description, e.category, e.amount, e.notes]),
-    ['Date','Description','Category','Amount','Notes']);
-  downloadFile(csv, 'expenses.csv', 'text/csv');
-});
-
-document.getElementById('btnExportExpensesXLSX').addEventListener('click', () => {
-  const data = getFilteredExpenses().map(e => ({ Date: e.date, Description: e.description, Category: e.category, Amount: Number(e.amount), Notes: e.notes }));
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Expenses');
-  XLSX.writeFile(wb, 'expenses.xlsx');
 });
 
 // ---- Helpers ----
@@ -1586,6 +1563,25 @@ SETUP INSTRUCTIONS
    ⚠️  WARNING: These rules allow anyone with your Firebase
    config to read/write your data. Keep this file private
    and don't share your config publicly.
+
+8. ENABLE STORAGE (needed for the Documents upload feature)
+   → In your project, go to Build → Storage → Get started
+   → Choose a location, click "Done" (test mode is fine to start)
+   → Go to Storage → Rules and use permanent rules like:
+
+   rules_version = '2';
+   service firebase.storage {
+     match /b/{bucket}/o {
+       match /{allPaths=**} {
+         allow read, write: if true;
+       }
+     }
+   }
+
+   ⚠️  Same warning as above — anyone with your config can
+   read/write/delete uploaded files under these rules.
+   If you skip this step, every other feature (Earnings,
+   Goals, Reminders) still works — only Documents needs Storage.
 
 ==============================================================
 -->
